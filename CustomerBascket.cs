@@ -2,28 +2,39 @@ namespace Warehouse
 {
     public class CustomerBasket
     {
-        public Dictionary<Item, int> contents { get; set;} = new Dictionary<Item, int>();
+        public Dictionary<Item, int> Contents { get; set; } = new Dictionary<Item, int>();
+
+        public CustomerBasket (Dictionary<Item, int> contents)
+        {
+            Contents = contents;
+        }
+
+
+        public decimal TotalPrice
+        {
+            get
+            {
+                decimal totalSum = 0;
+                foreach (var element in Contents)
+                {
+                    totalSum += element.Key.itemPrice * element.Value;
+                }
+                return totalSum;
+            }
+        }
+
         public void AddItemInBasket(Item item, int amount)
         {
-            this.contents.Add(item, amount);
+            Contents.Add(item, amount);
         }
 
         public void RemoveItemFromBasket(Item item)
         {
-            int amount = contents[item];
+            int amount = Contents[item];
             if (amount > 0)
             {
-                contents[item] = amount - 1;
+                Contents[item] = amount - 1;
             }
-        }
-        public decimal CalculateTotalPrice()
-        {
-            decimal totalSum = 0;
-            foreach (var element in contents)
-            {
-                totalSum += element.Key.itemPrice * element.Value;
-            }
-            return totalSum;
         }
     }
 

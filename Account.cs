@@ -2,7 +2,16 @@ namespace Warehouse
 {
     public class Account
     {
-        public decimal accountNumber { get; set; }
-    }
+        public decimal Amount { get; set; }
 
+        public Account()
+        {
+            Amount = 0;
+        }
+
+        public Account(decimal initialAmount)
+        {
+            Amount = initialAmount;
+        }
+    }
 }

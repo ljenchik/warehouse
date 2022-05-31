@@ -2,34 +2,48 @@ namespace Warehouse
 {
     public class Warehouse
     {
-        public Dictionary<Item, int> stock { get; } = new Dictionary<Item, int>();
-        public Account account { get; set; }
-        public Transaction transaction { get; set; }
+        public Dictionary<Item, int> Stock { get; } = new Dictionary<Item, int>();
+        public Account Account { get;  } = new Account();
+        public Transaction Transaction { get; set; }
+        public List<Transaction> Transactions { get; } = new List<Transaction>();
 
-
-        public void SellItem(Item item, int amount, Account seller)
+        public Warehouse(Dictionary<Item, int> initialStock)
         {
-            int stockAmount = stock[item];
-            if (stockAmount >= amount)
+            Stock = initialStock;
+        }
+        public void SellItem(CustomerBasket customerBasket, Account buyer)
+        {
+            foreach (Item item in customerBasket.Contents.Keys)
             {
-                stock[item] = stockAmount - amount;
-                seller.accountNumber += item.itemPrice * amount;
+                if (!Stock.ContainsKey(item))
+                {
+                    throw new ArgumentOutOfRangeException($"This {item} is not in stock.");
+                }
+                if (Stock[item] < customerBasket.Contents[item])
+                {
+                    throw new ArgumentOutOfRangeException($"Attemted to buy more of an {item} than are in stock.");
+                }
             }
-        }
-        public void AddItem(Item item, int amount, Account seller)
-        {
-            stock[item] += amount;
-            if (item.itemPrice * amount <= seller.accountNumber)
+            foreach (Item item in customerBasket.Contents.Keys)
             {
-                seller.accountNumber -= item.itemPrice * amount;
+                Stock[item] -= customerBasket.Contents[item];
             }
-        }
 
-        public bool IsInStock(Item item)
-        {
-            return stock[item] > 0;
-        }
+            Account.Amount += customerBasket.TotalPrice;
+            buyer.Amount -= customerBasket.TotalPrice;
 
+            Transaction transaction = new Transaction(
+                customerBasket.Contents,
+                DateTime.Now,
+                buyer,
+                Account
+            );
+            Transactions.Add(transaction);
+        }
     }
-
 }
+
+
+
+
+
